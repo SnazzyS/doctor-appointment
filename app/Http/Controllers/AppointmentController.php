@@ -39,7 +39,12 @@ class AppointmentController extends Controller
 
         $timeAvailibilty = DoctorSchedule::where('start_time', $start_time)->get();
      
-        dd($timeAvailibilty->contains('available', true));
+        if(!$timeAvailibilty->contains('available', true)) {
+            return response()->json([
+                "Message" => "Appointment is not available at this time"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    
 
         if (!$doctorAvailibity) {
             return response()->json([
