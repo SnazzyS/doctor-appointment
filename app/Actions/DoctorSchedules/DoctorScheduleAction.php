@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Doctor;
 use Carbon\CarbonInterval;
 use App\Models\DoctorSchedule;
+use App\Services\DoctorSchedule\AppointmentGenerator;
 use App\Services\ValidationService\DoctorScheduleCreateValidator;
 
 class DoctorScheduleAction
@@ -26,23 +27,12 @@ class DoctorScheduleAction
         $start_time = Carbon::parse($validatedData['start_time']);
         $end_time = Carbon::parse($validatedData['end_time']);
 
-        $slots = CarbonInterval::minutes(15)->toPeriod($start_time, $end_time);
 
-        
-        foreach ($slots as $slot) {
-            $endslot = $slot->copy()->addMinutes(15);
-            if ($endslot > $end_time) {
-                break;
-            }
+        (new AppointmentGenerator())->execute($doctor, $date, $start_time, $end_time);
 
-            $doctorSchedule = new DoctorSchedule();
-            $doctorSchedule->date = $date->format('Y-m-d');
-            $doctorSchedule->start_time = $slot->format('H:i:s');
-            $doctorSchedule->end_time = $endslot->format('H:i:s');
-            $doctorSchedule->doctor_id = $doctor->id;
-            $doctorSchedule->available = true;
-            $doctorSchedule->save();
-        }
+        return 'Appointments have been successfully generated';
+
+
     }
 
 
