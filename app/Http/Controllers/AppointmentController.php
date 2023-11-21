@@ -18,7 +18,6 @@ class AppointmentController extends Controller
             'doctor_id' => 'required|exists:doctors,id',
             'customer_id' => 'required|exists:customers,id',
             'time' => 'required|date_format:H:i'
-            // 'time' => ['required', 'date_format:H:i', new TimeAfterNow],
         ]);
 
         $date = Carbon::parse($request->date);
