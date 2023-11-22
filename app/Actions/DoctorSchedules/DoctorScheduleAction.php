@@ -4,10 +4,9 @@ namespace App\Actions\DoctorSchedules;
 
 use Carbon\Carbon;
 use App\Models\Doctor;
-use Carbon\CarbonInterval;
-use App\Models\DoctorSchedule;
 use App\Services\DoctorSchedule\AppointmentGenerator;
 use App\Services\ValidationService\DoctorScheduleCreateValidator;
+use Symfony\Component\HttpFoundation\Response;
 
 class DoctorScheduleAction
 {
@@ -27,10 +26,10 @@ class DoctorScheduleAction
         $start_time = Carbon::parse($validatedData['start_time']);
         $end_time = Carbon::parse($validatedData['end_time']);
 
+        $appointmentGenerator = new AppointmentGenerator();
+        $appointmentGenerator->execute($doctor, $date, $start_time, $end_time);
 
-        (new AppointmentGenerator())->execute($doctor, $date, $start_time, $end_time);
-
-        return 'Appointments have been successfully generated';
+        return Response::HTTP_OK;
 
 
     }

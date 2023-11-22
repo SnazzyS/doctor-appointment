@@ -28,29 +28,30 @@ class AppointmentCreateAction
         $start_time = $validatedData['time'];
         $end_time = $start_time->copy()->subMinutes(15);
 
-        // $doctorSchedule = DoctorSchedule::where('doctor_id', $doctor)->get();
         
-        $doctorAvailibity = DoctorSchedule::where('doctor_id', $doctor)
-        ->where('date', $date)
-        ->where('start_time', $start_time)
-        ->where('end_time', $end_time)
-        ->where('available', true)
-        ->get();
+        $this->checkDoctorAvailibilty($doctor, $date, $start_time, $end_time);
 
-        $timeAvailibilty = DoctorSchedule::where('start_time', $start_time)->get();
+        // $doctorAvailibity = DoctorSchedule::where('doctor_id', $doctor)
+        // ->where('date', $date)
+        // ->where('start_time', $start_time)
+        // ->where('end_time', $end_time)
+        // ->where('available', true)
+        // ->get();
+
+        // $timeAvailibilty = DoctorSchedule::where('start_time', $start_time)->get();
      
-        if(!$timeAvailibilty->contains('available', true)) {
-            return response()->json([
-                "Message" => "Appointment is not available at this time"
-            ], Response::HTTP_BAD_REQUEST);
-        }
+        // if(!$timeAvailibilty->contains('available', true)) {
+        //     return response()->json([
+        //         "Message" => "Appointment is not available at this time"
+        //     ], Response::HTTP_BAD_REQUEST);
+        // }
     
 
-        if (!$doctorAvailibity) {
-            return response()->json([
-                "Message" => "Appointment is not available at this time"
-            ], Response::HTTP_BAD_REQUEST);
-        }
+        // if (!$doctorAvailibity) {
+        //     return response()->json([
+        //         "Message" => "Appointment is not available at this time"
+        //     ], Response::HTTP_BAD_REQUEST);
+        // }
 
         
 
@@ -64,5 +65,21 @@ class AppointmentCreateAction
         $appointment->save();
 
         DoctorSchedule::where('start_time', $start_time)->update(['available' => false]);
+    }
+
+    private function checkDoctorAvailibilty($doctor, $date, $start_time, $end_time)
+    {
+        $doctorAvailibity = DoctorSchedule::where('doctor_id', $doctor)
+        ->where('date', $date)
+        ->where('start_time', $start_time)
+        ->where('end_time', $end_time)
+        ->where('available', true)
+        ->get();
+
+        if (!$doctorAvailibity) {
+            return response()->json([
+                "Message" => "Appointment is not available at this time"
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 }
